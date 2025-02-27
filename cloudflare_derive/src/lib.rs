@@ -1,7 +1,6 @@
 extern crate proc_macro;
-use std::any::Any;
 
-use proc_macro::{Ident, TokenStream, TokenTree};
+use proc_macro::{TokenStream, TokenTree};
 
 #[proc_macro_derive(DnsCommon)]
 pub fn dns_common(input: TokenStream) -> TokenStream {
@@ -9,7 +8,7 @@ pub fn dns_common(input: TokenStream) -> TokenStream {
     for tok in input.clone().into_iter() {
         match tok {
             TokenTree::Ident(v) => {
-                if (s.len() > 0) {
+                if s.len() > 0 {
                     s.pop();
                     s.push(v.to_string());
                     break;
