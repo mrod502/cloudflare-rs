@@ -6,18 +6,6 @@ use std::net::IpAddr;
 use enum_dispatch::enum_dispatch;
 use serde::{Deserialize, Serialize};
 
-#[enum_dispatch(DnsCommonEnum)]
-pub trait DnsCommon {
-    fn get_id(self) -> Option<String>;
-    fn set_id(&mut self, v: Option<String>);
-    fn get_zone_id(self) -> Option<String>;
-    fn set_zone_id(&mut self, v: Option<String>);
-    fn get_zone_name(self) -> Option<String>;
-    fn set_zone_name(&mut self, v: Option<String>);
-    fn get_name(self) -> Option<String>;
-    fn set_name(&mut self, v: Option<String>);
-}
-
 pub struct ContentError(String);
 
 pub trait DnsIpContent {
@@ -34,6 +22,18 @@ pub enum RecordMessage {
     CNAME(CNAMERecord),
     MX(MXRecord),
     TXT(TXTRecord),
+}
+
+#[enum_dispatch(RecordMessage)]
+pub trait DnsCommon {
+    fn get_id(self) -> Option<String>;
+    fn set_id(&mut self, v: Option<String>);
+    fn get_zone_id(self) -> Option<String>;
+    fn set_zone_id(&mut self, v: Option<String>);
+    fn get_zone_name(self) -> Option<String>;
+    fn set_zone_name(&mut self, v: Option<String>);
+    fn get_name(self) -> Option<String>;
+    fn set_name(&mut self, v: Option<String>);
 }
 
 pub trait ToRecordMessage {

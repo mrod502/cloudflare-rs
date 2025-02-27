@@ -43,7 +43,7 @@ impl ToRecordMessage for ARecord {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, DnsCommon)]
 pub struct AAAARecord {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
@@ -81,7 +81,7 @@ impl ToRecordMessage for AAAARecord {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, DnsCommon)]
 pub struct CNAMERecord {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
@@ -108,7 +108,7 @@ impl ToRecordMessage for CNAMERecord {
 #[derive(Serialize, Deserialize, Debug, Clone, Default)]
 pub struct Meta(Value);
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, DnsCommon)]
 pub struct MXRecord {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
@@ -148,7 +148,7 @@ impl ToRecordMessage for MXRecord {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+#[derive(Serialize, Deserialize, Debug, Clone, Default, DnsCommon)]
 pub struct TXTRecord {
     #[serde(skip_serializing_if = "Option::is_none")]
     pub id: Option<String>,
