@@ -1,7 +1,7 @@
 pub mod dns_settings;
 pub mod record;
 pub use record::{AAAARecord, ARecord, CNAMERecord, MXRecord, TXTRecord};
-use std::net::IpAddr;
+use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
 
 use enum_dispatch::enum_dispatch;
 use serde::{Deserialize, Serialize};
@@ -36,8 +36,20 @@ pub trait DnsCommon {
     fn set_name(&mut self, v: Option<String>);
 }
 
+pub enum RecordContent {
+    Ipv4(Ipv4Addr),
+    Ipv6(Ipv6Addr),
+    Text(String),
+}
+
 pub trait ToRecordMessage {
     fn to_record_message(self) -> RecordMessage;
+}
+
+impl ToRecordMessage for RecordMessage {
+    fn to_record_message(self) -> RecordMessage {
+        self
+    }
 }
 
 impl RecordMessage {
