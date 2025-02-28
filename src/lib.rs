@@ -51,8 +51,8 @@ pub struct V4PagePaginationArray<T> {
     pub result_info: Option<ResultInfo>,
 }
 
-#[derive(Serialize, Deserialize)]
-pub struct ApiError {}
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct ApiError(String);
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ResponseInfo {
@@ -60,7 +60,7 @@ pub struct ResponseInfo {
     pub message: String,
 }
 
-pub type ApiResult<T: Serialize + DeserializeOwned> = Result<T, ()>;
+pub type ApiResult<T: Serialize + DeserializeOwned> = Result<T, ApiError>;
 
 #[derive(Clone)]
 pub struct Cloudflare {
@@ -132,8 +132,8 @@ impl CloudflareDns {
 
     pub async fn get_record(
         &self,
-        zone_id: String,
-        record_id: String,
+        zone_id: &str,
+        record_id: &str,
     ) -> ApiResult<ApiResponse<RecordMessage>> {
         self.c
             .clone()
@@ -149,8 +149,8 @@ impl CloudflareDns {
     }
     pub async fn overwrite_record(
         self,
-        zone_id: String,
-        record_id: String,
+        zone_id: &str,
+        record_id: &str,
         record: impl ToRecordMessage,
     ) -> ApiResult<ApiResponse<RecordMessage>> {
         let record = record.to_record_message().for_update();
@@ -168,16 +168,16 @@ impl CloudflareDns {
 }
 
 impl Cloudflare {
-    pub fn with_email(self, email: String) -> Self {
+    pub fn with_email(self, email: &str) -> Self {
         let mut s = self.clone();
 
-        s.email = email;
+        s.email = email.to_string();
         s
     }
 
-    pub fn with_token(self, tok: String) -> Self {
+    pub fn with_token(self, tok: &str) -> Self {
         let mut s = self.clone();
-        s.auth_key = tok;
+        s.auth_key = tok.to_string();
         s
     }
 
@@ -196,7 +196,7 @@ impl Cloudflare {
     async fn perform(
         self,
         method: Method,
-        path: String,
+        path: &str,
         body: Option<Bytes>,
     ) -> ApiResult<Response<Incoming>> {
         let req_body = match body {
@@ -212,7 +212,7 @@ impl Cloudflare {
             .body(Full::new(req_body))
         {
             Ok(r) => r,
-            Err(e) => return Err(()),
+            Err(e) => return Err(ApiError(format!("{}", e))),
         };
 
         let client: Client<HttpsConnector<HttpConnector>, Full<Bytes>> =
@@ -225,14 +225,14 @@ impl Cloudflare {
             }
             Err(e) => {
                 error!("failed to send request:{}", e);
-                return Err(());
+                return Err(ApiError(format!("{}", e)));
             }
         };
 
         Ok(res)
     }
 
-    fn url(self, path: String) -> Result<Uri, ()> {
+    fn url(self, path: &str) -> Result<Uri, ApiError> {
         println!("getting uri");
         let base = self
             .base_url
@@ -245,7 +245,7 @@ impl Cloudflare {
         println!("URI:{}", uri);
         let res = match Uri::from_str(&uri) {
             Ok(u) => Ok(u),
-            Err(e) => Err(()),
+            Err(e) => Err(ApiError(format!("{}", e))),
         };
         println!("{:?}", res.clone());
         res
@@ -261,7 +261,7 @@ impl Cloudflare {
             None => None,
         };
 
-        let result = self.perform(method, opts.path, body).await?;
+        let result = self.perform(method, &opts.path, body).await?;
 
         let bytes = String::from_utf8(
             result
@@ -277,7 +277,7 @@ impl Cloudflare {
             Ok(v) => v,
             Err(e) => {
                 println!("error parsing json:{}", e);
-                return Err(());
+                return Err(ApiError(format!("error parsing json:{}", e)));
             }
         };
 
