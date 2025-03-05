@@ -4,7 +4,7 @@ pub use dns::*;
 use log::{error, info};
 
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
-use std::{collections::HashMap, str::FromStr};
+use std::{collections::HashMap, fmt::Display, str::FromStr};
 use url::Url;
 
 use http_body_util::{BodyExt, Full};
@@ -54,13 +54,19 @@ pub struct V4PagePaginationArray<T> {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ApiError(String);
 
+impl Display for ApiError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "ApiError:{}", self.0)
+    }
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 pub struct ResponseInfo {
     pub code: usize,
     pub message: String,
 }
 
-pub type ApiResult<T: Serialize + DeserializeOwned> = Result<T, ApiError>;
+pub type ApiResult<T> = Result<T, ApiError>;
 
 #[derive(Clone)]
 pub struct Cloudflare {
