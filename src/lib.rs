@@ -54,6 +54,12 @@ pub struct V4PagePaginationArray<T> {
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct ApiError(String);
 
+impl ApiError {
+    pub fn new(msg: impl ToString) -> Self {
+        Self(msg.to_string())
+    }
+}
+
 impl Display for ApiError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(f, "ApiError:{}", self.0)
