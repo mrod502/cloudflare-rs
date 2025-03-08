@@ -232,7 +232,7 @@ impl Cloudflare {
 
         let res = match client.request(req).await {
             Ok(r) => {
-                info!("success:{:?}", r);
+                debug!("success:{:?}", r);
                 r
             }
             Err(e) => {
