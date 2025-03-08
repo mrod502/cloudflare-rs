@@ -1,12 +1,21 @@
 pub mod dns_settings;
 pub mod record;
 pub use record::{AAAARecord, ARecord, CNAMERecord, MXRecord, TXTRecord};
-use std::net::{IpAddr, Ipv4Addr, Ipv6Addr};
+use std::{
+    fmt::Display,
+    net::{IpAddr, Ipv4Addr, Ipv6Addr},
+};
 
 use enum_dispatch::enum_dispatch;
 use serde::{Deserialize, Serialize};
 
 pub struct ContentError(String);
+
+impl Display for ContentError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "ContentError: {}", self.0)
+    }
+}
 
 pub trait DnsIpContent {
     fn get_content(self) -> IpAddr;

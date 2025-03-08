@@ -1,7 +1,7 @@
 pub mod dns;
 
 pub use dns::*;
-use log::{error, info};
+use log::{debug, error, info, warn};
 
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::{collections::HashMap, fmt::Display, str::FromStr};
@@ -245,7 +245,7 @@ impl Cloudflare {
     }
 
     fn url(self, path: &str) -> Result<Uri, ApiError> {
-        println!("getting uri");
+        debug!("getting uri");
         let base = self
             .base_url
             .clone()
@@ -254,12 +254,12 @@ impl Cloudflare {
             .to_string();
         let path = path.trim_start_matches("/");
         let uri = format!("{}/client/{}/{}", base, self.version.to_string(), path);
-        println!("URI:{}", uri);
+        debug!("URI:{}", uri);
         let res = match Uri::from_str(&uri) {
             Ok(u) => Ok(u),
             Err(e) => Err(ApiError(format!("{}", e))),
         };
-        println!("{:?}", res.clone());
+        debug!("{:?}", res.clone());
         res
     }
 
@@ -284,11 +284,11 @@ impl Cloudflare {
                 .to_vec(),
         )
         .unwrap_or_default();
-        println!("raw_body:{}", bytes);
+        debug!("raw_body:{}", bytes);
         let de: T = match serde_json::from_str(&bytes) {
             Ok(v) => v,
             Err(e) => {
-                println!("error parsing json:{}", e);
+                warn!("error parsing json:{}", e);
                 return Err(ApiError(format!("error parsing json:{}", e)));
             }
         };
