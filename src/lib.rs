@@ -272,7 +272,7 @@ impl Cloudflare {
             Some(bod) => Some(Bytes::from(serde_json::to_string(&bod).unwrap_or_default())),
             None => None,
         };
-
+        debug!("request body:{:?}", body);
         let result = self.perform(method, &opts.path, body).await?;
 
         let bytes = String::from_utf8(
