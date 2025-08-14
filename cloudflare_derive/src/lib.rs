@@ -41,6 +41,8 @@ pub fn dns_common(input: TokenStream) -> TokenStream {
     fn set_name(&mut self, v: Option<String>){
         self.name = v;
     }
+    fn set_content(&mut self, v: Option<String>){
+    }
 }
 "
     .to_string();

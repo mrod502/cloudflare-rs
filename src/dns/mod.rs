@@ -4,6 +4,7 @@ pub use record::{AAAARecord, ARecord, CNAMERecord, MXRecord, TXTRecord};
 use std::{
     fmt::Display,
     net::{IpAddr, Ipv4Addr, Ipv6Addr},
+    str::FromStr,
 };
 
 use enum_dispatch::enum_dispatch;
@@ -43,6 +44,7 @@ pub trait DnsCommon {
     fn set_zone_name(&mut self, v: Option<String>);
     fn get_name(self) -> Option<String>;
     fn set_name(&mut self, v: Option<String>);
+    fn set_content(&mut self, v: Option<String>);
 }
 
 pub enum RecordContent {
@@ -66,16 +68,17 @@ impl RecordMessage {
         match self {
             RecordMessage::A(r) => {
                 let mut rm = r.clone();
-                rm.id = None;
-                rm.zone_id = None;
+                //rm.id = None;
+                //rm.zone_id = None;
                 rm.zone_name = None;
                 rm.meta = None;
+                rm.modified_on = None;
                 RecordMessage::A(rm)
             }
             RecordMessage::AAAA(r) => {
                 let mut rm = r.clone();
-                rm.id = None;
-                rm.zone_id = None;
+                //rm.id = None;
+                //rm.zone_id = None;
                 rm.zone_name = None;
                 rm.meta = None;
                 RecordMessage::AAAA(rm)
@@ -104,6 +107,21 @@ impl RecordMessage {
                 rm.meta = None;
                 RecordMessage::TXT(rm)
             }
+        }
+    }
+    pub fn set_content(&mut self, value: String) {
+        match self {
+            Self::A(record) => {
+                if let Ok(v) = Ipv4Addr::from_str(&value) {
+                    record.content = Some(v)
+                }
+            }
+            Self::AAAA(record) => {
+                if let Ok(v) = Ipv6Addr::from_str(&value) {
+                    record.content = Some(v)
+                }
+            }
+            _ => {}
         }
     }
 }

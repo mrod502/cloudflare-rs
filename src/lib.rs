@@ -168,7 +168,7 @@ impl CloudflareDns {
         let record = record.to_record_message().for_update();
         self.c
             .perform_json(
-                Method::PUT,
+                Method::PATCH,
                 PerformOptions {
                     body: Some(record),
                     path: format!("zones/{}/dns_records/{}", zone_id, record_id),
@@ -226,6 +226,8 @@ impl Cloudflare {
             Ok(r) => r,
             Err(e) => return Err(ApiError(format!("{}", e))),
         };
+
+        debug!("REQUESTT:{:?}", req);
 
         let client: Client<HttpsConnector<HttpConnector>, Full<Bytes>> =
             Client::builder(hyper_util::rt::TokioExecutor::new()).build(HttpsConnector::new());
